@@ -15,6 +15,10 @@
         left: 0;
       }
 
+      #region1 {
+        visibility: hidden;
+      }
+
       #mapDiv {
         position: relative;
         display: inline-block;
@@ -22,25 +26,55 @@
     </style>
     <script>
       var o = 88;
-      var points = [
-        [572, 727 - o],
-        [585, 722 - o],
-        [598, 711 - o],
-        [622, 703 - o],
-        [644, 709 - o],
-        [650, 705 - o],
-        [657, 707 - o],
-        [657, 718 - o],
-        [672, 731 - o],
-        [666, 770 - o],
-        [655, 775 - o],
-        [650, 766 - o],
-        [644, 768 - o],
-        [642, 775 - o],
-        [629, 781 - o],
-        [609, 742 - o],
-        [594, 735 - o],
-        [580, 744 - o],
+      var p = 342;
+      var q = 25;
+      var coordinates = [
+        [
+          [572, 727 - o],
+          [585, 722 - o],
+          [598, 711 - o],
+          [622, 703 - o],
+          [644, 709 - o],
+          [650, 705 - o],
+          [657, 707 - o],
+          [657, 718 - o],
+          [672, 731 - o],
+          [666, 770 - o],
+          [655, 775 - o],
+          [650, 766 - o],
+          [644, 768 - o],
+          [642, 775 - o],
+          [629, 781 - o],
+          [609, 742 - o],
+          [594, 735 - o],
+          [580, 744 - o],
+        ],
+        [
+          [920 - p, 680 - q],
+          [934 - p, 673 - q],
+          [948 - p, 678 - q],
+          [971 - p, 717 - q],
+          [986 - p, 712 - q],
+          [986 - p, 704 - q],
+          [992 - p, 702 - q],
+          [996 - p, 713 - q],
+          [1012 - p, 705 - q],
+          [1034 - p, 713 - q],
+          [1040 - p, 712 - q],
+          [1054 - p, 715 - q],
+          [1084 - p, 707 - q],
+          [1102 - p, 708 - q],
+          [1116 - p, 700 - q],
+          [1128 - p, 709 - q],
+          [1156 - p, 714 - q],
+          [1165 - p, 712 - q],
+          [1180 - p, 713 - q],
+          [1195 - p, 729 - q],
+          [1214 - p, 825 - q],
+          [1115 - p, 853 - q],
+          [1017 - p, 765 - q],
+          [948 - p, 727 - q],
+        ],
       ];
 
       function resize() {
@@ -69,6 +103,8 @@
         return [w1, h1, w0, h0];
       }
 
+      var regions = [];
+
       function drawRegions(scaleX, scaleY) {
         var mapDiv = document.getElementById("mapDiv");
         var canvas = mapDiv.getElementsByTagName("canvas")[0];
@@ -76,31 +112,63 @@
         const devicePixelRatio = window.devicePixelRatio || 1;
         canvas.width = canvas.clientWidth * devicePixelRatio;
         canvas.height = canvas.clientHeight * devicePixelRatio;
-        context.fillStyle = "red";
         context.scale(devicePixelRatio, devicePixelRatio);
-        context.beginPath();
-        for (var i = 0; i < points.length; i++) {
-          var [x, y] = points[i];
-          if (i == 0) {
-            context.moveTo(x * scaleX, y * scaleY);
-          } else {
-            context.lineTo(x * scaleX, y * scaleY);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        regions = [];
+        for (let i = 0; i < coordinates.length; i++) {
+          const region = new Path2D();
+          for (let j = 0; j < coordinates[i].length; j++) {
+            const [x, y] = coordinates[i][j];
+            if (j === 0) {
+              region.moveTo(x * scaleX, y * scaleY);
+            } else {
+              region.lineTo(x * scaleX, y * scaleY);
+            }
           }
+          region.closePath();
+          // context.fillStyle = "red";
+          // context.fill(region);
+          regions.push(region);
         }
-        context.closePath();
-        context.fill();
       }
 
-      function dummy() {
+      function draw() {
         var [w1, h1, w0, h0] = resize();
         drawRegions(w1 / w0, h1 / h0);
       }
+
+      function updateSelectedRegion(selectedIndex) {
+        var imgs = [document.getElementById("region1")];
+        const targetId = `region${selectedIndex}`;
+        for (var i = 0; i < imgs.length; i++) {
+          imgs[i].style.visibility =
+            imgs[i].id == targetId ? "visible" : "hidden";
+        }
+      }
+
+      function init() {
+        var canvas = mapDiv.getElementsByTagName("canvas")[0];
+        canvas.addEventListener("mousemove", function (event) {
+          const rect = canvas.getBoundingClientRect();
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
+          const context = canvas.getContext("2d");
+          var selectedIndex = -1;
+          for (var i = 0; i < regions.length; i++) {
+            if (context.isPointInPath(regions[i], x, y)) {
+              selectedIndex = i;
+              break;
+            }
+          }
+          updateSelectedRegion(selectedIndex + 1);
+        });
+      }
     </script>
   </head>
-  <body onload="dummy();" , onresize="dummy();">
+  <body onload="init(); draw();" onresize="draw();">
     <div id="mapDiv">
       <img src="Map.svg" />
-      <img src="Central & Western.svg" />
+      <img src="Central & Western.svg" id="region1" />
       <canvas />
     </div>
   </body>
