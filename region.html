@@ -8,6 +8,7 @@
         text-align: center;
       }
 
+      img,
       canvas {
         position: absolute;
         top: 0;
@@ -20,39 +21,52 @@
       }
     </style>
     <script>
+      var o = 88;
       var points = [
-        [755, 580],
-        [758, 578],
-        [763, 582],
-        [772, 579],
-        [773, 573],
-        [795, 574],
-        [795, 584],
-        [803, 607],
-        [809, 614],
-        [815, 621],
-        [815, 628],
-        [820, 634],
-        [812, 635],
-        [792, 652],
-        [786, 647],
-        [786, 627],
-        [780, 623],
-        [773, 632],
-        [761, 633],
-        [766, 628],
-        [759, 585],
+        [572, 727 - o],
+        [585, 722 - o],
+        [598, 711 - o],
+        [622, 703 - o],
+        [644, 709 - o],
+        [650, 705 - o],
+        [657, 707 - o],
+        [657, 718 - o],
+        [672, 731 - o],
+        [666, 770 - o],
+        [655, 775 - o],
+        [650, 766 - o],
+        [644, 768 - o],
+        [642, 775 - o],
+        [629, 781 - o],
+        [609, 742 - o],
+        [594, 735 - o],
+        [580, 744 - o],
       ];
 
       function resize() {
-        var mapDiv = document.getElementById("mapDiv");
-        var img = mapDiv.getElementsByTagName("img")[0];
-        var canvas = mapDiv.getElementsByTagName("canvas")[0];
-        var h = window.innerHeight;
-        var w = (img.width * h) / img.height;
-        img.setAttribute("style", `width: ${w}px; height: ${h}px;`);
-        canvas.setAttribute("style", `width: ${w}px; height: ${h}px;`);
-        return [w, h, img.naturalWidth, img.naturalHeight];
+        const mapDiv = document.getElementById("mapDiv");
+        const imgs = mapDiv.getElementsByTagName("img");
+        const canvas = mapDiv.getElementsByTagName("canvas")[0];
+        var w1 = 0;
+        var h1 = window.innerHeight;
+        var w0 = 0;
+        var h0 = 0;
+        for (var i = 0; i < imgs.length; i++) {
+          const slices = imgs[i].src.split("/");
+          const fileName = slices[slices.length - 1];
+          if (fileName.toLowerCase() === "map.svg") {
+            w1 = (imgs[i].width * h1) / imgs[i].height;
+            w0 = imgs[i].naturalWidth;
+            h0 = imgs[i].naturalHeight;
+            break;
+          }
+        }
+        mapDiv.setAttribute("style", `width: ${w1}px; height: ${h1}px;`);
+        for (var i = 0; i < imgs.length; i++) {
+          imgs[i].setAttribute("style", `width: ${w1}px; height: ${h1}px;`);
+        }
+        canvas.setAttribute("style", `width: ${w1}px; height: ${h1}px;`);
+        return [w1, h1, w0, h0];
       }
 
       function drawRegions(scaleX, scaleY) {
@@ -85,7 +99,8 @@
   </head>
   <body onload="dummy();" , onresize="dummy();">
     <div id="mapDiv">
-      <img src="map.png" />
+      <img src="Map.svg" />
+      <img src="Central & Western.svg" />
       <canvas />
     </div>
   </body>
