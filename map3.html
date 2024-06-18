@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>Intro to SceneView - Create a 3D map</title>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.29/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.29/"></script>
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/SceneView",
+        "esri/layers/SceneLayer",
+      ], function (Map, SceneView, SceneLayer) {
+        const map = new Map({
+          basemap: "topo-3d",
+          ground: "world-elevation",
+        });
+
+        // Add the scene layer
+        const sceneLayer = new SceneLayer({
+          portalItem: {
+            id: "aa6b63f9143a4356b6f491819cdc1c27", // Item ID for the scene layer
+          },
+        });
+        map.add(sceneLayer);
+
+        const view = new SceneView({
+          container: "viewDiv", // Reference to the scene div
+          map: map, // Reference to the map object
+        });
+
+        // Add error handling
+        view
+          .when(() => {
+            console.log("Scene with SceneLayer loaded successfully!");
+          })
+          .catch((error) => {
+            console.error("Error loading Scene with SceneLayer: ", error);
+          });
+
+        view.on("click", function (event) {
+          view.hitTest(event).then(function (response) {
+            if (response.results.length) {
+              // Get the first result
+              const graphic = response.results[0].graphic;
+              console.log("Clicked on: ", graphic);
+
+              // You can access attributes and other properties of the graphic
+              const attributes = graphic.attributes;
+              console.log("Attributes: ", attributes);
+
+              // Do something with the clicked graphic
+              // For example, display a custom popup or log details to the console
+            }
+          });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
