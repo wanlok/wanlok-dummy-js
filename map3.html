@@ -6,7 +6,6 @@
       name="viewport"
       content="initial-scale=1, maximum-scale=1, user-scalable=no"
     />
-    <title>Intro to SceneView - Create a 3D map</title>
     <style>
       html,
       body,
@@ -27,7 +26,19 @@
         "esri/Map",
         "esri/views/SceneView",
         "esri/layers/SceneLayer",
-      ], function (Map, SceneView, SceneLayer) {
+        "esri/layers/FeatureLayer",
+        "esri/renderers/UniqueValueRenderer",
+        "esri/symbols/SimpleFillSymbol",
+        "esri/symbols/SimpleLineSymbol",
+      ], function (
+        Map,
+        SceneView,
+        SceneLayer,
+        FeatureLayer,
+        UniqueValueRenderer,
+        SimpleFillSymbol,
+        SimpleLineSymbol
+      ) {
         const map = new Map({
           basemap: "topo-3d",
           ground: "world-elevation",
@@ -46,6 +57,60 @@
           map: map, // Reference to the map object
         });
 
+        const outlineSymbol = new SimpleLineSymbol({
+          color: "transparent",
+          width: 1,
+        });
+
+        // Define fill symbols for each district (change the colors as needed)
+        // const fillSymbols = {
+        //   // 0: new SimpleFillSymbol({
+        //   //   color: "#FF0000",
+        //   //   outline: outlineSymbol,
+        //   // }),
+        //   // 1: new SimpleFillSymbol({
+        //   //   color: "#00FF00",
+        //   //   outline: outlineSymbol,
+        //   // }),
+        //   // Eastern: new SimpleFillSymbol({
+        //   //   color: "#00FF00",
+        //   //   outline: outlineSymbol,
+        //   // }),
+        //   // Southern: new SimpleFillSymbol({
+        //   //   color: "#0000FF",
+        //   //   outline: outlineSymbol,
+        //   // }),
+        //   "WAN CHAI": new SimpleFillSymbol({
+        //     color: "#FF0000",
+        //     outline: outlineSymbol,
+        //   }),
+        // };
+
+        // Define the renderer
+        const renderer = new UniqueValueRenderer({
+          field: "ENAME",
+          defaultSymbol: new SimpleFillSymbol({
+            color: "transparent", // Default color for undefined values
+            outline: outlineSymbol,
+          }),
+        });
+
+        // // Add unique value infos to the renderer
+        // for (const district in fillSymbols) {
+        //   renderer.addUniqueValueInfo({
+        //     value: district,
+        //     symbol: fillSymbols[district],
+        //     label: district,
+        //   });
+        // }
+
+        const featureLayer = new FeatureLayer({
+          url: "https://services3.arcgis.com/6j1KwZfY2fZrfNMR/arcgis/rest/services/Hong_Kong_18_Districts/FeatureServer/0",
+          renderer: renderer,
+        });
+
+        map.add(featureLayer, 0);
+
         // Add error handling
         view
           .when(() => {
@@ -57,7 +122,7 @@
 
         view.on("click", function (event) {
           view.hitTest(event).then(function (response) {
-            if (response.results.length) {
+            if (response.results.length > 0) {
               // Get the first result
               const graphic = response.results[0].graphic;
               console.log("Clicked on: ", graphic);
@@ -65,9 +130,29 @@
               // You can access attributes and other properties of the graphic
               const attributes = graphic.attributes;
               console.log("Attributes: ", attributes);
+            }
+          });
+        });
 
-              // Do something with the clicked graphic
-              // For example, display a custom popup or log details to the console
+        view.on("pointer-move", function (event) {
+          view.hitTest(event).then(function (response) {
+            view.graphics.removeAll();
+            if (response.results.length > 0) {
+              const graphic = response.results.filter(
+                (result) => result.graphic.layer === featureLayer
+              )[0]?.graphic;
+              if (graphic != null) {
+                view.graphics.add({
+                  geometry: graphic.geometry,
+                  symbol: new SimpleFillSymbol({
+                    color: "rgba(0, 0, 0, 0.5)", // Highlight color
+                    outline: new SimpleLineSymbol({
+                      color: "black",
+                      width: 2,
+                    }),
+                  }),
+                });
+              }
             }
           });
         });
