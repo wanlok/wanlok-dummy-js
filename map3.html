@@ -44,7 +44,6 @@
           ground: "world-elevation",
         });
 
-        // Add the scene layer
         const sceneLayer = new SceneLayer({
           portalItem: {
             id: "aa6b63f9143a4356b6f491819cdc1c27", // Item ID for the scene layer
@@ -53,8 +52,10 @@
         map.add(sceneLayer);
 
         const view = new SceneView({
-          container: "viewDiv", // Reference to the scene div
-          map: map, // Reference to the map object
+          container: "viewDiv",
+          map: map,
+          center: [114.1095, 22.3964],
+          zoom: 11,
         });
 
         const outlineSymbol = new SimpleLineSymbol({
@@ -86,7 +87,6 @@
         //   }),
         // };
 
-        // Define the renderer
         const renderer = new UniqueValueRenderer({
           field: "ENAME",
           defaultSymbol: new SimpleFillSymbol({
@@ -108,10 +108,8 @@
           url: "https://services3.arcgis.com/6j1KwZfY2fZrfNMR/arcgis/rest/services/Hong_Kong_18_Districts/FeatureServer/0",
           renderer: renderer,
         });
-
         map.add(featureLayer, 0);
 
-        // Add error handling
         view
           .when(() => {
             console.log("Scene with SceneLayer loaded successfully!");
@@ -124,18 +122,17 @@
           view.hitTest(event).then(function (response) {
             if (response.results.length > 0) {
               // Get the first result
-              const graphic = response.results[0].graphic;
-              console.log("Clicked on: ", graphic);
-
-              // You can access attributes and other properties of the graphic
-              const attributes = graphic.attributes;
-              console.log("Attributes: ", attributes);
+              for (var i = 0; i < response.results.length; i++) {
+                const attributes = response.results[i].graphic.attributes;
+                console.log("Attributes - " + i + ": ", attributes);
+              }
             }
           });
         });
 
         view.on("pointer-move", function (event) {
           view.hitTest(event).then(function (response) {
+            view.container.style.cursor = "default";
             view.graphics.removeAll();
             if (response.results.length > 0) {
               const graphic = response.results.filter(
@@ -148,10 +145,11 @@
                     color: "rgba(0, 0, 0, 0.5)", // Highlight color
                     outline: new SimpleLineSymbol({
                       color: "black",
-                      width: 2,
+                      width: 1,
                     }),
                   }),
                 });
+                view.container.style.cursor = "pointer";
               }
             }
           });
