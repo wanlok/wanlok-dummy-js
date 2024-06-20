@@ -66,20 +66,67 @@
         });
 
         view.whenLayerView(sceneLayer).then(function (layerView) {
-          sceneLayer.renderer = {
-            type: "simple", // autocasts as new SimpleRenderer()
-            symbol: {
-              type: "mesh-3d", // autocasts as new MeshSymbol3D()
+          sceneLayer.renderer = new UniqueValueRenderer({
+            field: "OBJECTID",
+            uniqueValueInfos: [
+              {
+                value: "42012",
+                symbol: {
+                  type: "mesh-3d",
+                  symbolLayers: [
+                    {
+                      type: "fill",
+                      material: {
+                        color: "red",
+                      },
+                    },
+                  ],
+                },
+                label: "Object 1",
+              },
+              {
+                value: "251487",
+                symbol: {
+                  type: "mesh-3d",
+                  symbolLayers: [
+                    {
+                      type: "fill",
+                      material: {
+                        color: "red",
+                      },
+                    },
+                  ],
+                },
+                label: "Object 1",
+              },
+              {
+                value: "41183",
+                symbol: {
+                  type: "mesh-3d",
+                  symbolLayers: [
+                    {
+                      type: "fill",
+                      material: {
+                        color: "red",
+                      },
+                    },
+                  ],
+                },
+                label: "Object 1",
+              },
+            ],
+            defaultSymbol: {
+              type: "mesh-3d",
               symbolLayers: [
                 {
-                  type: "fill", // autocasts as new FillSymbol3DLayer()
+                  type: "fill",
                   material: {
-                    color: "red",
+                    color: "green", // Default color for other objects
                   },
                 },
               ],
             },
-          };
+          });
         });
 
         const outlineSymbol = new SimpleLineSymbol({
