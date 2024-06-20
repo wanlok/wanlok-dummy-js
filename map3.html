@@ -30,6 +30,9 @@
         "esri/renderers/UniqueValueRenderer",
         "esri/symbols/SimpleFillSymbol",
         "esri/symbols/SimpleLineSymbol",
+        "esri/symbols/MeshSymbol3D",
+        "esri/symbols/FillSymbol3DLayer",
+        "esri/renderers/SimpleRenderer",
       ], function (
         Map,
         SceneView,
@@ -37,17 +40,21 @@
         FeatureLayer,
         UniqueValueRenderer,
         SimpleFillSymbol,
-        SimpleLineSymbol
+        SimpleLineSymbol,
+        MeshSymbol3D,
+        FillSymbol3DLayer,
+        SimpleRenderer
       ) {
         const map = new Map({
-          basemap: "topo-3d",
+          basemap: "topo",
           ground: "world-elevation",
         });
 
         const sceneLayer = new SceneLayer({
           portalItem: {
-            id: "aa6b63f9143a4356b6f491819cdc1c27", // Item ID for the scene layer
+            id: "aa6b63f9143a4356b6f491819cdc1c27",
           },
+          popupEnabled: false,
         });
         map.add(sceneLayer);
 
@@ -56,6 +63,23 @@
           map: map,
           center: [114.1095, 22.3964],
           zoom: 11,
+        });
+
+        view.whenLayerView(sceneLayer).then(function (layerView) {
+          sceneLayer.renderer = {
+            type: "simple", // autocasts as new SimpleRenderer()
+            symbol: {
+              type: "mesh-3d", // autocasts as new MeshSymbol3D()
+              symbolLayers: [
+                {
+                  type: "fill", // autocasts as new FillSymbol3DLayer()
+                  material: {
+                    color: "red",
+                  },
+                },
+              ],
+            },
+          };
         });
 
         const outlineSymbol = new SimpleLineSymbol({
