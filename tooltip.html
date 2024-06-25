@@ -41,28 +41,29 @@
         contentElement.className = "map-tooltip-content";
         contentElement.appendChild(document.createTextNode(text));
 
-        const tooltipElement = document.createElement("div");
-        tooltipElement.className = "map-tooltip";
-        tooltipElement.style.top = `${y}px`;
-        tooltipElement.appendChild(backgroundElement);
-        tooltipElement.appendChild(contentElement);
+        const wrapperElement = document.createElement("div");
+        wrapperElement.className = "map-tooltip-wrapper";
+        wrapperElement.style.top = `${y}px`;
+        wrapperElement.appendChild(backgroundElement);
+        wrapperElement.appendChild(contentElement);
 
         const pointerElement = document.createElement("div");
         pointerElement.className = "map-tooltip-pointer";
 
-        const divElement = document.createElement("div");
-        divElement.appendChild(tooltipElement);
-        divElement.appendChild(pointerElement);
+        const tooltipElement = document.createElement("div");
+        tooltipElement.className = "map-tooltip";
+        tooltipElement.appendChild(wrapperElement);
+        tooltipElement.appendChild(pointerElement);
 
-        parent.appendChild(divElement);
+        parent.appendChild(tooltipElement);
 
+        y = y - contentElement.offsetHeight;
+
+        tooltipElement.style.top = `${y}px`;
         tooltipElement.style.left = `${x}px`;
 
-        x =
-          x + (contentElement.offsetWidth / 2 - pointerElement.offsetWidth / 2);
-        y = y + contentElement.offsetHeight;
+        x = contentElement.offsetWidth / 2 - pointerElement.offsetWidth / 2;
 
-        pointerElement.style.top = `${y}px`;
         pointerElement.style.left = `${x}px`;
       }
     </script>
