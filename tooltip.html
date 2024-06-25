@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <style>
+      .map-tooltip {
+        position: absolute;
+      }
+
+      .map-tooltip-background {
+        position: absolute;
+        z-index: 0;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        background-color: rgb(0, 0, 0, 0.6);
+        border-radius: 8px;
+      }
+
+      .map-tooltip-pointer {
+        position: absolute;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-top: 20px solid rgb(0, 0, 0, 0.6);
+      }
+
+      .map-tooltip-content {
+        position: relative;
+        z-index: 1;
+        padding: 16px;
+        color: white;
+      }
+    </style>
+    <script>
+      function addTooltip(parent, x, y, className, text) {
+        y = y + 50;
+
+        const backgroundElement = document.createElement("div");
+        backgroundElement.className = "map-tooltip-background";
+
+        const contentElement = document.createElement("div");
+        contentElement.className = "map-tooltip-content";
+        contentElement.appendChild(document.createTextNode(text));
+
+        const tooltipElement = document.createElement("div");
+        tooltipElement.className = "map-tooltip";
+        tooltipElement.style.top = `${y}px`;
+        tooltipElement.appendChild(backgroundElement);
+        tooltipElement.appendChild(contentElement);
+
+        const pointerElement = document.createElement("div");
+        pointerElement.className = "map-tooltip-pointer";
+
+        const divElement = document.createElement("div");
+        divElement.appendChild(tooltipElement);
+        divElement.appendChild(pointerElement);
+
+        parent.appendChild(divElement);
+
+        tooltipElement.style.left = `${x}px`;
+
+        x =
+          x + (contentElement.offsetWidth / 2 - pointerElement.offsetWidth / 2);
+        y = y + contentElement.offsetHeight;
+
+        pointerElement.style.top = `${y}px`;
+        pointerElement.style.left = `${x}px`;
+      }
+    </script>
+  </head>
+  <body
+    onload="{addTooltip(document.getElementById('dummy'), 120, 120, 'tooltip', 'I go to school by bus');}"
+  >
+    <div
+      style="width: 400px; height: 400px; background-color: lightblue"
+      id="dummy"
+    ></div>
+  </body>
+</html>
